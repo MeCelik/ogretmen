@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const { Ders } = require("../models/dersler");
+const { ClassUnit } = require("../models/classUnits");
 const { body, validationResult } = require("express-validator");
-const mongoose = require("mongoose");
 const auth = require("../midlleware/auth");
+const mongoose = require("mongoose");
 
 router.post(
   "/",
@@ -16,31 +16,30 @@ router.post(
   auth,
   async (req, res) => {
     try {
-      if (!mongoose.isValidObjectId(req.body.grade.trim())) {
-        res.send("Grade must be an ObjectId");
+      if (!mongoose.isValidObjectId(req.body.classSubject.trim())) {
+        res.send("Category must be an ObjectId");
         return;
       }
-
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
       }
-      const { title, status, grade } = req.body;
+      const { title, classSubject, status } = req.body;
 
-      const existingDers = await Ders.find({
+      const existingClassUnit = await ClassUnit.find({
         title: { $regex: new RegExp(title.trim(), "i") },
       });
-      if (existingDers.length !== 0) {
-        res.send("This ders already exists");
+      if (existingClassUnit.length !== 0) {
+        res.send("This classUnit already exists");
         return;
       }
-      const ders = new Ders({
+      const classUnit = new ClassUnit({
         title,
+        classSubject,
         status,
-        grade,
       });
-      await ders.save();
-      res.send(ders);
+      await classUnit.save();
+      res.send(classUnit);
     } catch (error) {
       throw new Error(error);
     }
@@ -48,12 +47,12 @@ router.post(
 );
 router.get("/", async (req, res) => {
   try {
-    const dersler = await Ders.find({});
-    if (!dersler) {
+    const classUnitler = await ClassUnit.find({});
+    if (!classUnitler) {
       res.status(404).send();
       return;
     }
-    res.send(dersler);
+    res.send(classUnitler);
   } catch (error) {
     throw new Error(error);
   }
@@ -61,12 +60,12 @@ router.get("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   try {
-    const ders = await Ders.findById(req.params.id);
-    if (!ders) {
+    const classUnit = await ClassUnit.findById(req.params.id);
+    if (!classUnit) {
       res.status(404).send();
       return;
     }
-    res.send(ders);
+    res.send(classUnit);
   } catch (error) {
     throw new Error(error);
   }
@@ -80,32 +79,31 @@ router.patch(
   auth,
   async (req, res) => {
     try {
-      if (!mongoose.isValidObjectId(req.body.grade.trim())) {
-        res.send("Grade must be an ObjectId");
+      if (!mongoose.isValidObjectId(req.body.classSubject.trim())) {
+        res.send("Category must be an ObjectId");
         return;
       }
-
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
       }
-      const { title, grade } = req.body;
-      const ders = await Ders.findOneAndUpdate(
+      const { title, classSubject } = req.body;
+      const classUnit = await ClassUnit.findOneAndUpdate(
         req.params.id,
         {
           title,
-          grade,
+          classSubject,
         },
         { new: true }
       );
 
-      if (!ders) {
+      if (!classUnit) {
         res.status(404).send();
         return;
       }
 
-      await ders.save();
-      res.send(ders);
+      await classUnit.save();
+      res.send(classUnit);
     } catch (error) {
       throw new Error(error);
     }
@@ -114,16 +112,16 @@ router.patch(
 
 router.delete("/:id", auth, async (req, res) => {
   try {
-    const ders = await Ders.findByIdAndUpdate(
+    const classUnit = await ClassUnit.findByIdAndUpdate(
       req.params.id,
       { status: false },
       { new: true }
     );
-    if (!ders) {
+    if (!classUnit) {
       res.status(404).send();
       return;
     }
-    res.send(ders);
+    res.send(classUnit);
   } catch (error) {
     throw new Error(error);
   }

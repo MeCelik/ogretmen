@@ -3,6 +3,11 @@ require("dotenv").config();
 
 const app = express();
 app.use(express.json());
+app.use("/courses", courses);
+app.use("/grades", grades);
+app.use("/lessons", lessons);
+app.use("/units", units);
+app.use("/users", users);
 
 app.get("/", (req, res) => {
   res.send("not found");

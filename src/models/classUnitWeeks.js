@@ -1,28 +1,15 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
-const courseSchema = new Schema(
+const unitWeekSchema = new Schema(
   {
     title: { type: String, trim: true, required: true },
-    grade: {
+    classUnit: {
       type: Schema.Types.ObjectId,
       trim: true,
-      ref: "Grade",
+      ref: "ClassUnit",
       required: true,
     },
-    class: {
-      type: Schema.Types.ObjectId,
-      trim: true,
-      ref: "Class",
-      required: true,
-    },
-    unit: {
-      type: Schema.Types.ObjectId,
-      trim: true,
-      ref: "Unit",
-      required: true,
-    },
-    weeks: { type: Boolean, trim: true, default: true },
     achievement: { type: String, trim: true, required: true },
     description: { type: String, trim: true, required: true },
     subject: { type: String, trim: true, required: true },
@@ -33,6 +20,6 @@ const courseSchema = new Schema(
   { timestamps: true }
 );
 
-const Course = model("Course", courseSchema);
+const UnitWeek = model("UnitWeek", unitWeekSchema);
 
-module.exports = { Course };
+module.exports = { UnitWeek };

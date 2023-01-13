@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const { Grade } = require("../models/grades");
+const { CourseSubject } = require("../models/courseSubjects");
 const { body, validationResult } = require("express-validator");
 const auth = require("../midlleware/auth");
+const mongoose = require("mongoose");
 
 router.post(
   "/",
@@ -15,25 +16,30 @@ router.post(
   auth,
   async (req, res) => {
     try {
+      if (!mongoose.isValidObjectId(req.body.grade.trim())) {
+        res.send("Category must be an ObjectId");
+        return;
+      }
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
       }
-      const { title, status } = req.body;
+      const { title, status, grade } = req.body;
 
-      const existingGrade = await Grade.find({
+      const existingCourseSubject = await CourseSubject.find({
         title: { $regex: new RegExp(title.trim(), "i") },
       });
-      if (existingGrade.length !== 0) {
-        res.send("This grade already exists");
+      if (existingCourseSubject.length !== 0) {
+        res.send("This courseSubject already exists");
         return;
       }
-      const grade = new Grade({
+      const courseSubject = new CourseSubject({
         title,
+        grade,
         status,
       });
-      await grade.save();
-      res.send(grade);
+      await courseSubject.save();
+      res.send(courseSubject);
     } catch (error) {
       throw new Error(error);
     }
@@ -41,12 +47,12 @@ router.post(
 );
 router.get("/", async (req, res) => {
   try {
-    const gradeler = await Grade.find({});
-    if (!gradeler) {
+    const courseSubjectler = await CourseSubject.find({});
+    if (!courseSubjectler) {
       res.status(404).send();
       return;
     }
-    res.send(gradeler);
+    res.send(courseSubjectler);
   } catch (error) {
     throw new Error(error);
   }
@@ -54,12 +60,12 @@ router.get("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   try {
-    const grade = await Grade.findById(req.params.id);
-    if (!grade) {
+    const courseSubject = await CourseSubject.findById(req.params.id);
+    if (!courseSubject) {
       res.status(404).send();
       return;
     }
-    res.send(grade);
+    res.send(courseSubject);
   } catch (error) {
     throw new Error(error);
   }
@@ -77,22 +83,23 @@ router.patch(
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
       }
-      const { title } = req.body;
-      const grade = await Grade.findOneAndUpdate(
+      const { title, grade } = req.body;
+      const courseSubject = await CourseSubject.findOneAndUpdate(
         req.params.id,
         {
           title,
+          grade,
         },
         { new: true }
       );
 
-      if (!grade) {
+      if (!courseSubject) {
         res.status(404).send();
         return;
       }
 
-      await grade.save();
-      res.send(grade);
+      await courseSubject.save();
+      res.send(courseSubject);
     } catch (error) {
       throw new Error(error);
     }
@@ -101,16 +108,16 @@ router.patch(
 
 router.delete("/:id", auth, async (req, res) => {
   try {
-    const grade = await Grade.findByIdAndUpdate(
+    const courseSubject = await CourseSubject.findByIdAndUpdate(
       req.params.id,
       { status: false },
       { new: true }
     );
-    if (!grade) {
+    if (!courseSubject) {
       res.status(404).send();
       return;
     }
-    res.send(grade);
+    res.send(courseSubject);
   } catch (error) {
     throw new Error(error);
   }

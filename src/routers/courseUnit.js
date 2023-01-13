@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const { Lesson } = require("../models/lessons");
+const { CourseUnit } = require("../models/courseUnits");
 const { body, validationResult } = require("express-validator");
-const mongoose = require("mongoose");
 const auth = require("../midlleware/auth");
+const mongoose = require("mongoose");
 
 router.post(
   "/",
@@ -13,55 +13,33 @@ router.post(
   body("status")
     .isBoolean()
     .withMessage("status must be either true or false  long"),
-  body("status")
-    .isBoolean()
-    .withMessage("status must be either true or false  long"),
-  body("status")
-    .isBoolean()
-    .withMessage("status must be either true or false  long"),
-  body("status")
-    .isBoolean()
-    .withMessage("status must be either true or false  long"),
-  body("status")
-    .isBoolean()
-    .withMessage("status must be either true or false  long"),
-  body("status")
-    .isBoolean()
-    .withMessage("status must be either true or false  long"),
-  body("status")
-    .isBoolean()
-    .withMessage("status must be either true or false  long"),
-  body("status")
-    .isBoolean()
-    .withMessage("status must be either true or false  long"),
   auth,
   async (req, res) => {
     try {
-      if (!mongoose.isValidObjectId(req.body.ders.trim())) {
-        res.send("Lesson must be an ObjectId");
+      if (!mongoose.isValidObjectId(req.body.courseSubject.trim())) {
+        res.send("Category must be an ObjectId");
         return;
       }
-
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
       }
-      const { title, status, ders } = req.body;
+      const { title, courseSubject, status } = req.body;
 
-      const existingLesson = await Lesson.find({
+      const existingCourseUnit = await CourseUnit.find({
         title: { $regex: new RegExp(title.trim(), "i") },
       });
-      if (existingLesson.length !== 0) {
-        res.send("This lesson already exists");
+      if (existingCourseUnit.length !== 0) {
+        res.send("This courseUnit already exists");
         return;
       }
-      const lesson = new Lesson({
+      const courseUnit = new CourseUnit({
         title,
+        courseSubject,
         status,
-        ders,
       });
-      await lesson.save();
-      res.send(lesson);
+      await courseUnit.save();
+      res.send(courseUnit);
     } catch (error) {
       throw new Error(error);
     }
@@ -69,12 +47,12 @@ router.post(
 );
 router.get("/", async (req, res) => {
   try {
-    const lessonler = await Lesson.find({});
-    if (!lessonler) {
+    const courseUnitler = await CourseUnit.find({});
+    if (!courseUnitler) {
       res.status(404).send();
       return;
     }
-    res.send(lessonler);
+    res.send(courseUnitler);
   } catch (error) {
     throw new Error(error);
   }
@@ -82,12 +60,12 @@ router.get("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   try {
-    const lesson = await Lesson.findById(req.params.id);
-    if (!lesson) {
+    const courseUnit = await CourseUnit.findById(req.params.id);
+    if (!courseUnit) {
       res.status(404).send();
       return;
     }
-    res.send(lesson);
+    res.send(courseUnit);
   } catch (error) {
     throw new Error(error);
   }
@@ -101,32 +79,31 @@ router.patch(
   auth,
   async (req, res) => {
     try {
-      if (!mongoose.isValidObjectId(req.body.ders.trim())) {
-        res.send("Lesson must be an ObjectId");
+      if (!mongoose.isValidObjectId(req.body.courseSubject.trim())) {
+        res.send("Category must be an ObjectId");
         return;
       }
-
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
       }
-      const { title, ders } = req.body;
-      const lesson = await Lesson.findOneAndUpdate(
+      const { title, courseSubject } = req.body;
+      const courseUnit = await CourseUnit.findOneAndUpdate(
         req.params.id,
         {
           title,
-          ders,
+          courseSubject,
         },
         { new: true }
       );
 
-      if (!lesson) {
+      if (!courseUnit) {
         res.status(404).send();
         return;
       }
 
-      await lesson.save();
-      res.send(lesson);
+      await courseUnit.save();
+      res.send(courseUnit);
     } catch (error) {
       throw new Error(error);
     }
@@ -135,16 +112,16 @@ router.patch(
 
 router.delete("/:id", auth, async (req, res) => {
   try {
-    const lesson = await Lesson.findByIdAndUpdate(
+    const courseUnit = await CourseUnit.findByIdAndUpdate(
       req.params.id,
       { status: false },
       { new: true }
     );
-    if (!lesson) {
+    if (!courseUnit) {
       res.status(404).send();
       return;
     }
-    res.send(lesson);
+    res.send(courseUnit);
   } catch (error) {
     throw new Error(error);
   }

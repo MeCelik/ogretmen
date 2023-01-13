@@ -1,13 +1,13 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
-const dersSchema = new Schema(
+const unitSchema = new Schema(
   {
     title: { type: String, trim: true, required: true },
-    grade: {
+    classSubject: {
       type: Schema.Types.ObjectId,
       trim: true,
-      ref: "Grade",
+      ref: "ClassSubject",
       required: true,
     },
     status: { type: Boolean, trim: true, default: true },
@@ -15,6 +15,6 @@ const dersSchema = new Schema(
   { timestamps: true }
 );
 
-const Ders = model("Ders", dersSchema);
+const Unit = model("Unit", unitSchema);
 
-module.exports = { Ders };
+module.exports = { Unit };
