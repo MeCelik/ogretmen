@@ -11,7 +11,7 @@ app.use(express.json());
 // app.use("/classSubjects", classSubjects);
 // app.use("/classUnits", classUnits);
 // app.use("/classUnitWeeks", classUnitWeeks);
-// app.use("/grades", grades);
+app.use("/grades", grades);
 app.use("/users", users);
 
 app.get("/", (req, res) => {
