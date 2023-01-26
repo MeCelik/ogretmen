@@ -15,6 +15,6 @@ const unitSchema = new Schema(
   { timestamps: true }
 );
 
-const Unit = model("Unit", unitSchema);
+const ClassUnit = model("ClassUnit", unitSchema);
 
-module.exports = { Unit };
+module.exports = { ClassUnit };

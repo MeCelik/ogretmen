@@ -8,9 +8,9 @@ const users = require("./routers/user");
 
 const app = express();
 app.use(express.json());
-// app.use("/classSubjects", classSubjects);
-// app.use("/classUnits", classUnits);
-// app.use("/classUnitWeeks", classUnitWeeks);
+app.use("/classSubjects", classSubjects);
+app.use("/classUnits", classUnits);
+app.use("/classUnitWeeks", classUnitWeeks);
 app.use("/grades", grades);
 app.use("/users", users);
 
