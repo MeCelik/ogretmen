@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { Grade } = require("../models/grades");
 const { body, validationResult } = require("express-validator");
-const auth = require("../midlleware/auth");
+const auth = require("../middleware/auth");
 
 router.post(
   "/",
