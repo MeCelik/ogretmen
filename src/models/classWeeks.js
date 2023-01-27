@@ -1,13 +1,13 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
-const unitSchema = new Schema(
+const classWeekSchema = new Schema(
   {
     title: { type: String, trim: true, required: true },
-    courseSubject: {
+    classSubject: {
       type: Schema.Types.ObjectId,
       trim: true,
-      ref: "CourseSubject",
+      ref: "ClassSubject",
       required: true,
     },
     status: { type: Boolean, trim: true, default: true },
@@ -15,6 +15,6 @@ const unitSchema = new Schema(
   { timestamps: true }
 );
 
-const Unit = model("Unit", unitSchema);
+const ClassWeek = model("ClassWeek", classWeekSchema);
 
-module.exports = { Unit };
+module.exports = { ClassWeek };

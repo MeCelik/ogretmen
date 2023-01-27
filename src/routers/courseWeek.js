@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { CourseUnit } = require("../models/courseUnits");
+const { CourseWeek } = require("../models/courseWeeks");
 const { body, validationResult } = require("express-validator");
 const auth = require("../middleware/auth");
 const mongoose = require("mongoose");
@@ -26,20 +26,20 @@ router.post(
       }
       const { title, courseSubject, status } = req.body;
 
-      const existingCourseUnit = await CourseUnit.find({
+      const existingCourseWeek = await CourseWeek.find({
         title: { $regex: new RegExp(title.trim(), "i") },
       });
-      if (existingCourseUnit.length !== 0) {
-        res.send("This courseUnit already exists");
+      if (existingCourseWeek.length !== 0) {
+        res.send("This courseWeek already exists");
         return;
       }
-      const courseUnit = new CourseUnit({
+      const courseWeek = new CourseWeek({
         title,
         courseSubject,
         status,
       });
-      await courseUnit.save();
-      res.send(courseUnit);
+      await courseWeek.save();
+      res.send(courseWeek);
     } catch (error) {
       throw new Error(error);
     }
@@ -47,12 +47,12 @@ router.post(
 );
 router.get("/", async (req, res) => {
   try {
-    const courseUnitler = await CourseUnit.find({});
-    if (!courseUnitler) {
+    const courseWeekler = await CourseWeek.find({});
+    if (!courseWeekler) {
       res.status(404).send();
       return;
     }
-    res.send(courseUnitler);
+    res.send(courseWeekler);
   } catch (error) {
     throw new Error(error);
   }
@@ -60,12 +60,12 @@ router.get("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   try {
-    const courseUnit = await CourseUnit.findById(req.params.id);
-    if (!courseUnit) {
+    const courseWeek = await CourseWeek.findById(req.params.id);
+    if (!courseWeek) {
       res.status(404).send();
       return;
     }
-    res.send(courseUnit);
+    res.send(courseWeek);
   } catch (error) {
     throw new Error(error);
   }
@@ -88,7 +88,7 @@ router.patch(
         return res.status(400).json({ errors: errors.array() });
       }
       const { title, courseSubject } = req.body;
-      const courseUnit = await CourseUnit.findOneAndUpdate(
+      const courseWeek = await CourseWeek.findOneAndUpdate(
         req.params.id,
         {
           title,
@@ -97,13 +97,13 @@ router.patch(
         { new: true }
       );
 
-      if (!courseUnit) {
+      if (!courseWeek) {
         res.status(404).send();
         return;
       }
 
-      await courseUnit.save();
-      res.send(courseUnit);
+      await courseWeek.save();
+      res.send(courseWeek);
     } catch (error) {
       throw new Error(error);
     }
@@ -112,16 +112,16 @@ router.patch(
 
 router.delete("/:id", auth, async (req, res) => {
   try {
-    const courseUnit = await CourseUnit.findByIdAndUpdate(
+    const courseWeek = await CourseWeek.findByIdAndUpdate(
       req.params.id,
       { status: false },
       { new: true }
     );
-    if (!courseUnit) {
+    if (!courseWeek) {
       res.status(404).send();
       return;
     }
-    res.send(courseUnit);
+    res.send(courseWeek);
   } catch (error) {
     throw new Error(error);
   }

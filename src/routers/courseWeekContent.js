@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { CourseUnitWeek } = require("../models/courseUnitWeeks");
+const { CourseWeekContent } = require("../models/courseWeekContents");
 const { body, validationResult } = require("express-validator");
 const auth = require("../middleware/auth");
 const mongoose = require("mongoose");
@@ -31,7 +31,7 @@ router.post(
   auth,
   async (req, res) => {
     try {
-      if (!mongoose.isValidObjectId(req.body.courseUnit.trim())) {
+      if (!mongoose.isValidObjectId(req.body.courseWeek.trim())) {
         res.send("Category must be an ObjectId");
         return;
       }
@@ -41,7 +41,7 @@ router.post(
       }
       const {
         title,
-        courseUnit,
+        courseWeek,
         achievement,
         description,
         subject,
@@ -50,16 +50,16 @@ router.post(
         status,
       } = req.body;
 
-      const existingCourseUnitWeek = await CourseUnitWeek.find({
+      const existingCourseWeekContent = await CourseWeekContent.find({
         title: { $regex: new RegExp(title.trim(), "i") },
       });
-      if (existingCourseUnitWeek.length !== 0) {
-        res.send("This courseUnitWeek already exists");
+      if (existingCourseWeekContent.length !== 0) {
+        res.send("This courseWeekContent already exists");
         return;
       }
-      const courseUnitWeek = new CourseUnitWeek({
+      const courseWeekContent = new CourseWeekContent({
         title,
-        courseUnit,
+        courseWeek,
         achievement,
         description,
         subject,
@@ -67,8 +67,8 @@ router.post(
         notes,
         status,
       });
-      await courseUnitWeek.save();
-      res.send(courseUnitWeek);
+      await courseWeekContent.save();
+      res.send(courseWeekContent);
     } catch (error) {
       throw new Error(error);
     }
@@ -76,12 +76,12 @@ router.post(
 );
 router.get("/", async (req, res) => {
   try {
-    const courseUnitWeekler = await CourseUnitWeek.find({});
-    if (!courseUnitWeekler) {
+    const courseWeekContentler = await CourseWeekContent.find({});
+    if (!courseWeekContentler) {
       res.status(404).send();
       return;
     }
-    res.send(courseUnitWeekler);
+    res.send(courseWeekContentler);
   } catch (error) {
     throw new Error(error);
   }
@@ -89,12 +89,12 @@ router.get("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   try {
-    const courseUnitWeek = await CourseUnitWeek.findById(req.params.id);
-    if (!courseUnitWeek) {
+    const courseWeekContent = await CourseWeekContent.findById(req.params.id);
+    if (!courseWeekContent) {
       res.status(404).send();
       return;
     }
-    res.send(courseUnitWeek);
+    res.send(courseWeekContent);
   } catch (error) {
     throw new Error(error);
   }
@@ -108,7 +108,7 @@ router.patch(
   auth,
   async (req, res) => {
     try {
-      if (!mongoose.isValidObjectId(req.body.courseUnit.trim())) {
+      if (!mongoose.isValidObjectId(req.body.courseWeek.trim())) {
         res.send("Category must be an ObjectId");
         return;
       }
@@ -118,14 +118,14 @@ router.patch(
       }
       const {
         title,
-        courseUnit,
+        courseWeek,
         achievement,
         description,
         subject,
         terms,
         notes,
       } = req.body;
-      const courseUnitWeek = await CourseUnitWeek.findOneAndUpdate(
+      const courseWeekContent = await CourseWeekContent.findOneAndUpdate(
         req.params.id,
         {
           title,
@@ -134,18 +134,18 @@ router.patch(
           subject,
           terms,
           notes,
-          courseUnit,
+          courseWeek,
         },
         { new: true }
       );
 
-      if (!courseUnitWeek) {
+      if (!courseWeekContent) {
         res.status(404).send();
         return;
       }
 
-      await courseUnitWeek.save();
-      res.send(courseUnitWeek);
+      await courseWeekContent.save();
+      res.send(courseWeekContent);
     } catch (error) {
       throw new Error(error);
     }
@@ -154,16 +154,16 @@ router.patch(
 
 router.delete("/:id", auth, async (req, res) => {
   try {
-    const courseUnitWeek = await CourseUnitWeek.findByIdAndUpdate(
+    const courseWeekContent = await CourseWeekContent.findByIdAndUpdate(
       req.params.id,
       { status: false },
       { new: true }
     );
-    if (!courseUnitWeek) {
+    if (!courseWeekContent) {
       res.status(404).send();
       return;
     }
-    res.send(courseUnitWeek);
+    res.send(courseWeekContent);
   } catch (error) {
     throw new Error(error);
   }

@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { ClassUnit } = require("../models/classUnits");
+const { ClassWeek } = require("../models/classWeeks");
 const { body, validationResult } = require("express-validator");
 const auth = require("../middleware/auth");
 const mongoose = require("mongoose");
@@ -26,20 +26,20 @@ router.post(
       }
       const { title, classSubject, status } = req.body;
 
-      const existingClassUnit = await ClassUnit.find({
+      const existingClassWeek = await ClassWeek.find({
         title: { $regex: new RegExp(title.trim(), "i") },
       });
-      if (existingClassUnit.length !== 0) {
-        res.send("This classUnit already exists");
+      if (existingClassWeek.length !== 0) {
+        res.send("This classWeek already exists");
         return;
       }
-      const classUnit = new ClassUnit({
+      const classWeek = new ClassWeek({
         title,
         classSubject,
         status,
       });
-      await classUnit.save();
-      res.send(classUnit);
+      await classWeek.save();
+      res.send(classWeek);
     } catch (error) {
       throw new Error(error);
     }
@@ -47,12 +47,12 @@ router.post(
 );
 router.get("/", async (req, res) => {
   try {
-    const classUnitler = await ClassUnit.find({});
-    if (!classUnitler) {
+    const classWeeks = await ClassWeek.find({});
+    if (!classWeeks) {
       res.status(404).send();
       return;
     }
-    res.send(classUnitler);
+    res.send(classWeeks);
   } catch (error) {
     throw new Error(error);
   }
@@ -60,12 +60,12 @@ router.get("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   try {
-    const classUnit = await ClassUnit.findById(req.params.id);
-    if (!classUnit) {
+    const classWeek = await ClassWeek.findById(req.params.id);
+    if (!classWeek) {
       res.status(404).send();
       return;
     }
-    res.send(classUnit);
+    res.send(classWeek);
   } catch (error) {
     throw new Error(error);
   }
@@ -88,7 +88,7 @@ router.patch(
         return res.status(400).json({ errors: errors.array() });
       }
       const { title, classSubject } = req.body;
-      const classUnit = await ClassUnit.findOneAndUpdate(
+      const classWeek = await ClassWeek.findOneAndUpdate(
         req.params.id,
         {
           title,
@@ -97,13 +97,13 @@ router.patch(
         { new: true }
       );
 
-      if (!classUnit) {
+      if (!classWeek) {
         res.status(404).send();
         return;
       }
 
-      await classUnit.save();
-      res.send(classUnit);
+      await classWeek.save();
+      res.send(classWeek);
     } catch (error) {
       throw new Error(error);
     }
@@ -112,16 +112,16 @@ router.patch(
 
 router.delete("/:id", auth, async (req, res) => {
   try {
-    const classUnit = await ClassUnit.findByIdAndUpdate(
+    const classWeek = await ClassWeek.findByIdAndUpdate(
       req.params.id,
       { status: false },
       { new: true }
     );
-    if (!classUnit) {
+    if (!classWeek) {
       res.status(404).send();
       return;
     }
-    res.send(classUnit);
+    res.send(classWeek);
   } catch (error) {
     throw new Error(error);
   }

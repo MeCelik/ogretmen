@@ -1,16 +1,18 @@
 const express = require("express");
 require("dotenv").config();
 const classSubjects = require("./routers/classSubject");
-const classUnits = require("./routers/classUnit");
-const classUnitWeeks = require("./routers/classUnitWeeks");
+const classWeeks = require("./routers/classWeek");
+const classWeekContents = require("./routers/classWeekContent");
 const grades = require("./routers/grade");
 const users = require("./routers/user");
+var cors = require("cors");
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 app.use("/classSubjects", classSubjects);
-app.use("/classUnits", classUnits);
-app.use("/classUnitWeeks", classUnitWeeks);
+app.use("/classWeeks", classWeeks);
+app.use("/classWeekContents", classWeekContents);
 app.use("/grades", grades);
 app.use("/users", users);
 
