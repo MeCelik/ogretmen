@@ -3,11 +3,12 @@ const { Schema, model } = mongoose;
 
 const classWeekContentSchema = new Schema(
   {
+    week: { type: String, trim: true, required: true },
     title: { type: String, trim: true, required: true },
-    classWeek: {
+    classSubject: {
       type: Schema.Types.ObjectId,
       trim: true,
-      ref: "ClassWeek",
+      ref: "ClassSubject",
       required: true,
     },
     achievement: { type: String, trim: true, required: true },
