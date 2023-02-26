@@ -16,25 +16,26 @@ router.post(
   body("achievement")
     .isLength({ min: 1 })
     .withMessage("achievement must be at least 1 char long"),
-  body("description")
-    .isLength({ min: 1 })
-    .withMessage("description must be at least 1 char long"),
-  body("subject")
-    .isLength({ min: 1 })
-    .withMessage("subject must be at least 1 char long"),
-  body("terms")
-    .isLength({ min: 1 })
-    .withMessage("terms must be at least 1 char long"),
-  body("notes")
-    .isLength({ min: 1 })
-    .withMessage("notes must be at least 1 char long"),
   body("status")
     .isBoolean()
     .withMessage("status must be either true or false  long"),
+  // body("description")
+  //   .isLength({ min: 1 })
+  //   .withMessage("description must be at least 1 char long"),
+  // body("subject")
+  //   .isLength({ min: 1 })
+  //   .withMessage("subject must be at least 1 char long"),
+  // body("terms")
+  //   .isLength({ min: 1 })
+  //   .withMessage("terms must be at least 1 char long"),
+  // body("notes")
+  //   .isLength({ min: 1 })
+  //   .withMessage("notes must be at least 1 char long"),
+
   auth,
   async (req, res) => {
     try {
-      if (!mongoose.isValidObjectId(req.body.classSubject)) {
+      if (!mongoose.isValidObjectId(req.body.gradeSubject)) {
         res.send("Class subject must be an ObjectId");
         return;
       }
@@ -42,17 +43,7 @@ router.post(
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
       }
-      const {
-        week,
-        title,
-        classSubject,
-        achievement,
-        description,
-        subject,
-        terms,
-        notes,
-        status,
-      } = req.body;
+      const { week, title, gradeSubject, achievement, status } = req.body;
 
       const existingClassWeekContent = await ClassWeekContent.find({
         title: { $regex: new RegExp(title.trim(), "i") },
@@ -64,12 +55,8 @@ router.post(
       const classWeekContent = new ClassWeekContent({
         week,
         title,
-        classSubject,
+        gradeSubject,
         achievement,
-        description,
-        subject,
-        terms,
-        notes,
         status,
       });
       await classWeekContent.save();
@@ -116,50 +103,29 @@ router.patch(
   body("achievement")
     .isLength({ min: 1 })
     .withMessage("achievement must be at least 1 char long"),
-  body("description")
-    .isLength({ min: 1 })
-    .withMessage("description must be at least 1 char long"),
-  body("subject")
-    .isLength({ min: 1 })
-    .withMessage("subject must be at least 1 char long"),
-  body("terms")
-    .isLength({ min: 1 })
-    .withMessage("terms must be at least 1 char long"),
-  body("notes")
-    .isLength({ min: 1 })
-    .withMessage("notes must be at least 1 char long"),
+  body("status")
+    .isBoolean()
+    .withMessage("status must be either true or false  long"),
   auth,
   async (req, res) => {
     try {
-      if (!mongoose.isValidObjectId(req.body.classSubject.trim())) {
-        res.send("Category must be an ObjectId");
+      if (!mongoose.isValidObjectId(req.body.gradeSubject)) {
+        res.send("Class subject must be an ObjectId");
         return;
       }
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
       }
-      const {
-        week,
-        title,
-        classSubject,
-        achievement,
-        description,
-        subject,
-        terms,
-        notes,
-      } = req.body;
+      const { week, title, gradeSubject, achievement, status } = req.body;
       const classWeekContent = await ClassWeekContent.findOneAndUpdate(
         req.params.id,
         {
           week,
           title,
-          classSubject,
+          gradeSubject,
           achievement,
-          description,
-          subject,
-          terms,
-          notes,
+          status,
         },
         { new: true }
       );
