@@ -34,7 +34,7 @@ router.post(
   auth,
   async (req, res) => {
     try {
-      if (!mongoose.isValidObjectId(req.body.classSubject.trim())) {
+      if (!mongoose.isValidObjectId(req.body.classSubject)) {
         res.send("Class subject must be an ObjectId");
         return;
       }

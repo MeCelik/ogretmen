@@ -3,6 +3,7 @@ const router = express.Router();
 const { Grade } = require("../models/grades");
 const { body, validationResult } = require("express-validator");
 const auth = require("../middleware/auth");
+const { ClassWeekContent } = require("../models/classWeekContents");
 
 router.post(
   "/",
@@ -64,6 +65,18 @@ router.get("/:id", async (req, res) => {
     throw new Error(error);
   }
 });
+router.get("/:id/weeks", async (req, res) => {
+  try {
+    const weeks = await ClassWeekContent.find({ gradeSubject: req.params.id });
+    if (!weeks) {
+      res.status(404).send();
+      return;
+    }
+    res.send(weeks);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
 
 router.patch(
   "/:id",
@@ -77,14 +90,9 @@ router.patch(
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
       }
-      const { title } = req.body;
-      const grade = await Grade.findOneAndUpdate(
-        req.params.id,
-        {
-          title,
-        },
-        { new: true }
-      );
+      const grade = await Grade.findOneAndUpdate(req.params.id, req.body, {
+        new: true,
+      });
 
       if (!grade) {
         res.status(404).send();
