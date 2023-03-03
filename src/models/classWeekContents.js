@@ -3,7 +3,11 @@ const { Schema, model } = mongoose;
 
 const classWeekContentSchema = new Schema(
   {
-    week: { type: String, trim: true, required: true },
+    week: {
+      start: { type: Date, required: true },
+      end: { type: Date, required: true },
+      value: { type: Date, required: true },
+    },
     title: { type: String, trim: true, required: true },
     gradeSubject: {
       type: Schema.Types.ObjectId,

@@ -7,9 +7,9 @@ const mongoose = require("mongoose");
 
 router.post(
   "/",
-  body("week")
-    .isLength({ min: 1 })
-    .withMessage("week must be at least 1 char long"),
+  // body("week")
+  //   .isLength({ min: 1 })
+  //   .withMessage("week must be at least 1 char long"),
   body("title")
     .isLength({ min: 1 })
     .withMessage("title must be at least 1 char long"),
@@ -94,9 +94,9 @@ router.get("/:id", async (req, res) => {
 
 router.patch(
   "/:id",
-  body("week")
-    .isLength({ min: 1 })
-    .withMessage("week must be at least 1 char long"),
+  // body("week")
+  //   .isLength({ min: 1 })
+  //   .withMessage("week must be at least 1 char long"),
   body("title")
     .isLength({ min: 1 })
     .withMessage("title must be at least 1 char long"),
