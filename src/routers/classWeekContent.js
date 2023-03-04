@@ -43,7 +43,8 @@ router.post(
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
       }
-      const { week, title, gradeSubject, achievement, status } = req.body;
+      const { week, title, gradeSubject, achievement, status, htmlVersion } =
+        req.body;
 
       const existingClassWeekContent = await ClassWeekContent.find({
         title: { $regex: new RegExp(title.trim(), "i") },
@@ -58,6 +59,7 @@ router.post(
         gradeSubject,
         achievement,
         status,
+        htmlVersion,
       });
       await classWeekContent.save();
       res.send(classWeekContent);
@@ -117,7 +119,8 @@ router.patch(
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
       }
-      const { week, title, gradeSubject, achievement, status } = req.body;
+      const { week, title, gradeSubject, achievement, status, htmlVersion } =
+        req.body;
       const classWeekContent = await ClassWeekContent.findOneAndUpdate(
         req.params.id,
         {
@@ -126,6 +129,7 @@ router.patch(
           gradeSubject,
           achievement,
           status,
+          htmlVersion,
         },
         { new: true }
       );

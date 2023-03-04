@@ -15,6 +15,7 @@ const classWeekContentSchema = new Schema(
       required: true,
     },
     achievement: { type: String, trim: true, required: true },
+    htmlVersion: { type: String, trim: true, required: true },
     status: { type: Boolean, trim: true, default: true },
     // description: { type: String, trim: true, required: true },
     // subject: { type: String, trim: true, required: true },

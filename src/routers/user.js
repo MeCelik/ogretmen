@@ -4,15 +4,23 @@ const { User } = require("../models/users");
 const { body, validationResult } = require("express-validator");
 const auth = require("../middleware/auth");
 
+router.get("/", auth, async (req, res) => {
+  try {
+    const users = await User.find({});
+    res.send(users);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
 router.post(
   "/",
   body("userType")
     .isLength({ min: 1 })
     .withMessage("Usertype must be either Admin or Employee"),
-  body("firstname")
+  body("firstName")
     .isLength({ min: 1 })
     .withMessage("Firstname must be at least 1 char long"),
-  body("lastname")
+  body("lastName")
     .isLength({ min: 1 })
     .withMessage("Lastname must be at least 1 char long"),
   body("email").isEmail().withMessage("Email is invalid"),
@@ -29,8 +37,8 @@ router.post(
       }
       const {
         userType,
-        firstname,
-        lastname,
+        firstName,
+        lastName,
         phoneNumber,
         password,
         email,
@@ -45,8 +53,8 @@ router.post(
       }
       const user = new User({
         userType,
-        firstname,
-        lastname,
+        firstName,
+        lastName,
         phoneNumber,
         email,
         password,
@@ -110,10 +118,10 @@ router.patch(
   body("userType")
     .isLength({ min: 1 })
     .withMessage("Usertype must be either Admin or Employee"),
-  body("firstname")
+  body("firstName")
     .isLength({ min: 1 })
     .withMessage("Firstname must be at least 1 char long"),
-  body("lastname")
+  body("lastName")
     .isLength({ min: 1 })
     .withMessage("Lastname must be at least 1 char long"),
   body("phoneNumber")
@@ -132,14 +140,14 @@ router.patch(
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
       }
-      const { userType, firstname, lastname, email, password } = req.body;
+      const { userType, firstName, lastName, email, password } = req.body;
 
       const user = await User.findOneAndUpdate(
         req.user._id,
         {
           userType,
-          firstname,
-          lastname,
+          firstName,
+          lastName,
           phoneNumber,
           email,
           password,

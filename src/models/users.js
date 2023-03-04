@@ -10,8 +10,8 @@ const userSchema = new Schema({
     trim: true,
     enum: ["Admin", "Customer"],
   },
-  firstname: { type: String, trim: true, required: true },
-  lastname: { type: String, trim: true, required: true },
+  firstName: { type: String, trim: true, required: true },
+  lastName: { type: String, trim: true, required: true },
   phoneNumber: { type: String, trim: true, required: true },
   email: {
     type: String,
