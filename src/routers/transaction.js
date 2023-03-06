@@ -2,34 +2,35 @@ const express = require("express");
 const router = express.Router();
 const { Transaction } = require("../models/transactions");
 const { body, validationResult } = require("express-validator");
-const auth = require("../middleware/auth");
+const admin = require("../middleware/admin");
 
 router.post(
   "/",
   body("cost")
     .isLength({ min: 1 })
-    .withMessage("title must be at least 1 char long"),
-  body("carriedOut")
+    .withMessage("cost must be at least 1 char long"),
+  body("customerId")
     .isLength({ min: 1 })
-    .withMessage("title must be at least 1 char long"),
+    .withMessage("customerId must be at least 1 char long"),
   body("status")
     .isBoolean()
     .withMessage("status must be either true or false  long"),
-  auth,
+  admin,
   async (req, res) => {
     try {
-      if (!mongoose.isValidObjectId(req.body.fromUser.trim())) {
-        res.send("fromUser must be an ObjectId");
+      if (!mongoose.isValidObjectId(req.body.customerId.trim())) {
+        res.send("customerId must be an ObjectId");
         return;
       }
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
       }
-      const { cost, carriedOut, status, fromUser } = req.body;
+      const { cost, customerId, adminId, status, type } = req.body;
 
       const existingTransaction = await Transaction.find({
-        title: { $regex: new RegExp(title.trim(), "i") },
+        customerId,
+        type,
       });
       if (existingTransaction.length !== 0) {
         res.send("This transaction already exists");
@@ -37,9 +38,10 @@ router.post(
       }
       const transaction = new Transaction({
         cost,
-        carriedOut,
+        customerId,
+        adminId,
         status,
-        fromUser,
+        type,
       });
       await transaction.save();
       res.send(transaction);
@@ -48,7 +50,7 @@ router.post(
     }
   }
 );
-router.get("/", auth, async (req, res) => {
+router.get("/", admin, async (req, res) => {
   try {
     const transactionler = await Transaction.find({});
     if (!transactionler) {
@@ -61,7 +63,7 @@ router.get("/", auth, async (req, res) => {
   }
 });
 
-router.get("/:id", auth, async (req, res) => {
+router.get("/:id", admin, async (req, res) => {
   try {
     const transaction = await Transaction.findById(req.params.id);
     if (!transaction) {
@@ -74,49 +76,37 @@ router.get("/:id", auth, async (req, res) => {
   }
 });
 
-router.patch(
-  "/:id",
-  body("title")
-    .isLength({ min: 1 })
-    .withMessage("title must be at least 1 char long"),
-  auth,
-  async (req, res) => {
-    try {
-      if (!mongoose.isValidObjectId(req.body.fromUser.trim())) {
-        res.send("fromUser must be an ObjectId");
-        return;
-      }
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
-      const { title } = req.body;
-      const transaction = await Transaction.findOneAndUpdate(
-        req.params.id,
-        {
-          title,
-        },
-        { new: true }
-      );
-
-      if (!transaction) {
-        res.status(404).send();
-        return;
-      }
-
-      await transaction.save();
-      res.send(transaction);
-    } catch (error) {
-      throw new Error(error);
+router.patch("/:id", admin, async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
-  }
-);
+    const transaction = await Transaction.findOneAndUpdate(
+      req.params.id,
+      {
+        ...req.body,
+      },
+      { new: true }
+    );
 
-router.delete("/:id", auth, async (req, res) => {
+    if (!transaction) {
+      res.status(404).send();
+      return;
+    }
+
+    await transaction.save();
+    res.send(transaction);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+router.delete("/:id", admin, async (req, res) => {
   try {
     const transaction = await Transaction.findByIdAndUpdate(
       req.params.id,
-      { status: false },
+      { status: "cancelled" },
       { new: true }
     );
     if (!transaction) {
