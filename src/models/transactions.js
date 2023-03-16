@@ -6,7 +6,6 @@ const transactionSchema = new Schema(
     cost: { type: String, trim: true, required: true },
     customerId: {
       type: Schema.Types.ObjectId,
-      trim: true,
       ref: "User",
       required: true,
     },

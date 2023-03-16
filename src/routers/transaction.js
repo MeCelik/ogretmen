@@ -1,4 +1,5 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const router = express.Router();
 const { Transaction } = require("../models/transactions");
 const { body, validationResult } = require("express-validator");
@@ -13,7 +14,7 @@ router.post(
     .isLength({ min: 1 })
     .withMessage("customerId must be at least 1 char long"),
   body("status")
-    .isBoolean()
+    .isLength({ min: 1 })
     .withMessage("status must be either true or false  long"),
   admin,
   async (req, res) => {
@@ -52,12 +53,27 @@ router.post(
 );
 router.get("/", admin, async (req, res) => {
   try {
-    const transactionler = await Transaction.find({});
-    if (!transactionler) {
+    const transactions = await Transaction.find({});
+    if (!transactions) {
       res.status(404).send();
       return;
     }
-    res.send(transactionler);
+    res.send(transactions);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+router.get("/customer/:id", admin, async (req, res) => {
+  try {
+    const transaction = await Transaction.findOne({
+      customerId: req.params.id,
+    });
+    if (!transaction) {
+      res.send(null);
+      return;
+    }
+    res.send(transaction);
   } catch (error) {
     throw new Error(error);
   }
