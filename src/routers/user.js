@@ -3,6 +3,7 @@ const router = express.Router();
 const { User } = require("../models/users");
 const { body, validationResult } = require("express-validator");
 const auth = require("../middleware/auth");
+const { Transaction } = require("../models/transactions");
 
 router.get("/", auth, async (req, res) => {
   try {
@@ -43,6 +44,7 @@ router.post(
         password,
         email,
         status,
+        premium,
       } = req.body;
       const existingUsers = await User.find({
         email: { $regex: new RegExp(email, "i") },

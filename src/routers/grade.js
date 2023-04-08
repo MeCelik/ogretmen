@@ -20,7 +20,7 @@ router.post(
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
       }
-      const { title, status } = req.body;
+      const { title, status, planId } = req.body;
 
       const existingGrade = await Grade.find({
         title: { $regex: new RegExp(title.trim(), "i") },
@@ -32,6 +32,7 @@ router.post(
       const grade = new Grade({
         title,
         status,
+        planId,
       });
       await grade.save();
       res.send(grade);
@@ -42,12 +43,12 @@ router.post(
 );
 router.get("/", async (req, res) => {
   try {
-    const gradeler = await Grade.find({});
-    if (!gradeler) {
+    const grades = await Grade.find({});
+    if (!grades) {
       res.status(404).send();
       return;
     }
-    res.send(gradeler);
+    res.send(grades);
   } catch (error) {
     throw new Error(error);
   }

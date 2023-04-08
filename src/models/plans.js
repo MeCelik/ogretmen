@@ -1,19 +1,14 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
-const gradeSchema = new Schema(
+const planSchema = new Schema(
   {
     title: { type: String, trim: true, required: true },
     status: { type: Boolean, trim: true, default: true },
-    planId: {
-      type: Schema.Types.ObjectId,
-      ref: "Plan",
-      required: true,
-    },
   },
   { timestamps: true }
 );
 
-const Grade = model("Grade", gradeSchema);
+const Plan = model("Plan", planSchema);
 
-module.exports = { Grade };
+module.exports = { Plan };

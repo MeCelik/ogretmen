@@ -4,6 +4,7 @@ const router = express.Router();
 const { Transaction } = require("../models/transactions");
 const { body, validationResult } = require("express-validator");
 const admin = require("../middleware/admin");
+const auth = require("../middleware/auth");
 
 router.post(
   "/",
@@ -64,7 +65,7 @@ router.get("/", admin, async (req, res) => {
   }
 });
 
-router.get("/customer/:id", admin, async (req, res) => {
+router.get("/customer/:id", auth, async (req, res) => {
   try {
     const transaction = await Transaction.findOne({
       customerId: req.params.id,
