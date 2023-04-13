@@ -121,7 +121,8 @@ router.patch(
       }
       const { week, title, gradeSubject, achievement, status, htmlVersion } =
         req.body;
-      const classWeekContent = await ClassWeekContent.findOneAndUpdate(
+      console.log(req.params.id);
+      const classWeekContent = await ClassWeekContent.findByIdAndUpdate(
         req.params.id,
         {
           week,

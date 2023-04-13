@@ -91,7 +91,7 @@ router.patch(
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
       }
-      const grade = await Grade.findOneAndUpdate(req.params.id, req.body, {
+      const grade = await Grade.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
       });
 
