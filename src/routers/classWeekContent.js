@@ -80,6 +80,25 @@ router.get("/", async (req, res) => {
     throw new Error(error);
   }
 });
+router.get("/current/:gradeId", async (req, res) => {
+  try {
+    const currentDate = new Date();
+    const classWeekContents = await ClassWeekContent.findOne({
+      gradeSubject: req.params.gradeId,
+      $and: [
+        { "week.start": { $lt: currentDate } },
+        { "week.end": { $gt: currentDate } },
+      ],
+    });
+    if (!classWeekContents) {
+      res.status(404).send();
+      return;
+    }
+    res.send(classWeekContents);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
 
 router.get("/:id", async (req, res) => {
   try {
