@@ -3,6 +3,7 @@ const router = express.Router();
 const admin = require("../middleware/admin");
 const { Grade } = require("../models/grades");
 const { Plan } = require("../models/plans");
+const auth = require("../middleware/auth");
 
 router.post("/", admin, async (req, res) => {
   try {
@@ -28,6 +29,15 @@ router.get("/:id", async (req, res) => {});
 router.get("/:id/grades", admin, async (req, res) => {
   try {
     const grades = await Grade.find({ planId: req.params.id });
+    res.send(grades);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send(error);
+  }
+});
+router.get("/:id/customer-grades", auth, async (req, res) => {
+  try {
+    const grades = await Grade.find({ planId: req.params.id, status: true });
     res.send(grades);
   } catch (error) {
     console.log(error);
