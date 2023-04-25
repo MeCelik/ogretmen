@@ -6,6 +6,7 @@ const grades = require("./routers/grade");
 const users = require("./routers/user");
 const transaction = require("./routers/transaction");
 const plans = require("./routers/plan");
+const weeklyPlan = require("./routers/weeklyPlan");
 var cors = require("cors");
 
 const app = express();
@@ -17,6 +18,7 @@ app.use("/grades", grades);
 app.use("/users", users);
 app.use("/transaction", transaction);
 app.use("/plans", plans);
+app.use("/weekly-plans", weeklyPlan);
 
 app.get("/", (req, res) => {
   res.send("not found");
