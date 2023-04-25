@@ -112,6 +112,42 @@ router.get("/:id", async (req, res) => {
     throw new Error(error);
   }
 });
+router.get("/:id/next", async (req, res) => {
+  try {
+    const currentWeek = await ClassWeekContent.findById(req.params.id);
+    const sevenDays = 1000 * 60 * 60 * 24 * 7;
+    const nextW = new Date(currentWeek.week.value.getTime() + sevenDays);
+    const nextWeek = await ClassWeekContent.findOne({
+      gradeSubject: currentWeek.gradeSubject,
+      $and: [{ "week.start": { $lt: nextW } }, { "week.end": { $gt: nextW } }],
+    });
+    if (!nextWeek) {
+      res.status(404).send();
+      return;
+    }
+    res.send(nextWeek);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+router.get("/:id/prev", async (req, res) => {
+  try {
+    const currentWeek = await ClassWeekContent.findById(req.params.id);
+    const sevenDays = 1000 * 60 * 60 * 24 * 7;
+    const nextW = new Date(currentWeek.week.value.getTime() - sevenDays);
+    const prevWeek = await ClassWeekContent.findOne({
+      gradeSubject: currentWeek.gradeSubject,
+      $and: [{ "week.start": { $lt: nextW } }, { "week.end": { $gt: nextW } }],
+    });
+    if (!prevWeek) {
+      res.status(404).send();
+      return;
+    }
+    res.send(prevWeek);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
 
 router.patch(
   "/:id",
