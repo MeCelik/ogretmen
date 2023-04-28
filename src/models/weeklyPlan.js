@@ -36,7 +36,7 @@ const daySchema = new Schema({
 
 const weeklyPlanSchema = new Schema(
   {
-    teachler: {
+    teacher: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,

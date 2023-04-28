@@ -6,7 +6,7 @@ const { WeeklyPlan, DayOfWeek } = require("../models/weeklyPlan");
 
 router.get("/mine", auth, async (req, res) => {
   try {
-    const weeklyPlan = await WeeklyPlan.findOne({ teachler: req.user.id });
+    const weeklyPlan = await WeeklyPlan.findOne({ teacher: req.user.id });
     if (!weeklyPlan) {
       const days = await DayOfWeek.find({});
       const newWeeklyPlan = new WeeklyPlan({
@@ -16,7 +16,7 @@ router.get("/mine", auth, async (req, res) => {
             classes: [],
           };
         }),
-        teachler: req.user.id,
+        teacher: req.user.id,
       });
       await newWeeklyPlan.save();
       return res.send(newWeeklyPlan);
@@ -26,7 +26,33 @@ router.get("/mine", auth, async (req, res) => {
     throw new Error(error);
   }
 });
-
+router.get("/mine/:dayId", auth, async (req, res) => {
+  try {
+    const weeklyPlan = await WeeklyPlan.findOne({ teacher: req.user.id });
+    if (!weeklyPlan) {
+      const days = await DayOfWeek.find({});
+      const newWeeklyPlan = new WeeklyPlan({
+        days: days.map((singleDay) => {
+          return {
+            weekDay: singleDay.id,
+            classes: [],
+          };
+        }),
+        teacher: req.user.id,
+      });
+      await newWeeklyPlan.save();
+      const day = weeklyPlan.days.find((item) =>
+        item.weekDay.equals(req.params.dayId)
+      );
+      console.log(weeklyPlan);
+      return res.send(day);
+    }
+    res.send(weeklyPlan);
+  } catch (error) {
+    console.log(error);
+    throw new Error(error);
+  }
+});
 router.get("/all", admin, async (req, res) => {
   try {
     res.send({});
@@ -35,15 +61,27 @@ router.get("/all", admin, async (req, res) => {
   }
 });
 
-router.patch("/:id/:dayId", auth, async (req, res) => {
+router.patch("/:dayId", auth, async (req, res) => {
   try {
+    console.log("TEST");
     const { classes } = req.body;
     const weeklyPlan = await WeeklyPlan.findOneAndUpdate(
-      { teachler: req.user.id, "days._id": req.params.dayId },
+      { teacher: req.user._id, "days.weekDay": req.params.dayId },
       { $set: { "days.$.classes": classes } },
       { new: true }
     );
+    console.log(req.user._id);
+    console.log(weeklyPlan);
     res.send(weeklyPlan);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+router.get("/days", async (req, res) => {
+  try {
+    const days = await DayOfWeek.find({});
+    res.send(days);
   } catch (error) {
     throw new Error(error);
   }
