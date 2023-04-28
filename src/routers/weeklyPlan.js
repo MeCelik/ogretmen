@@ -28,7 +28,18 @@ router.get("/mine", auth, async (req, res) => {
 });
 router.get("/mine/:dayId", auth, async (req, res) => {
   try {
-    const weeklyPlan = await WeeklyPlan.findOne({ teacher: req.user.id });
+    const weeklyPlan = await WeeklyPlan.findOne({
+      teacher: req.user.id,
+    }).populate({
+      path: "days",
+      populate: {
+        path: "classes",
+        populate: {
+          path: "classId",
+          model: "ClassModel",
+        },
+      },
+    });
     if (!weeklyPlan) {
       const days = await DayOfWeek.find({});
       const newWeeklyPlan = new WeeklyPlan({
@@ -44,10 +55,12 @@ router.get("/mine/:dayId", auth, async (req, res) => {
       const day = weeklyPlan.days.find((item) =>
         item.weekDay.equals(req.params.dayId)
       );
-      console.log(weeklyPlan);
       return res.send(day);
     }
-    res.send(weeklyPlan);
+    const day = weeklyPlan.days.find((item) =>
+      item.weekDay.equals(req.params.dayId)
+    );
+    res.send(day);
   } catch (error) {
     console.log(error);
     throw new Error(error);

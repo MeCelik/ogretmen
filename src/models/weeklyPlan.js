@@ -1,3 +1,5 @@
+const { ClassModel } = require("./class");
+
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
@@ -14,6 +16,7 @@ const DayOfWeek = model("dayOfWeek", dayOfWeekSchema);
 const singleClass = new Schema({
   classId: {
     type: Schema.Types.ObjectId,
+    ref: "ClassModel",
   },
   start: {
     type: Number,
