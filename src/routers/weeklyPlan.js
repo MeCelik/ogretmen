@@ -3,6 +3,7 @@ const router = express.Router();
 const auth = require("../middleware/auth");
 const admin = require("../middleware/admin");
 const { WeeklyPlan, DayOfWeek } = require("../models/weeklyPlan");
+const { default: mongoose } = require("mongoose");
 
 router.get("/mine", auth, async (req, res) => {
   try {
@@ -35,7 +36,7 @@ router.get("/mine/:dayId", auth, async (req, res) => {
       populate: {
         path: "classes",
         populate: {
-          path: "classId",
+          path: "class",
           model: "ClassModel",
         },
       },
@@ -76,15 +77,42 @@ router.get("/all", admin, async (req, res) => {
 
 router.patch("/:dayId", auth, async (req, res) => {
   try {
-    console.log("TEST");
     const { classes } = req.body;
+    const resSctructured = classes.map((item) => {
+      return { ...item, class: mongoose.Types.ObjectId(item.class) };
+    });
     const weeklyPlan = await WeeklyPlan.findOneAndUpdate(
       { teacher: req.user._id, "days.weekDay": req.params.dayId },
-      { $set: { "days.$.classes": classes } },
+      { $set: { "days.$.classes": resSctructured } },
       { new: true }
     );
-    console.log(req.user._id);
-    console.log(weeklyPlan);
+    res.send(weeklyPlan);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+router.patch("/:dayId/push-class", auth, async (req, res) => {
+  try {
+    const { singleClass } = req.body;
+    const weeklyPlan = await WeeklyPlan.findOneAndUpdate(
+      { teacher: req.user._id, "days.weekDay": req.params.dayId },
+      { $push: { "days.$.classes": singleClass } },
+      { new: true }
+    );
+    res.send(weeklyPlan);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+router.patch("/:dayId/update-class/:classId", auth, async (req, res) => {
+  try {
+    const { singleClass } = req.body;
+    console.log(singleClass);
+    const weeklyPlan = await WeeklyPlan.findOneAndUpdate(
+      { teacher: req.user._id, "days.weekDay": req.params.dayId },
+      { $push: { "days.$.classes": singleClass } },
+      { new: true }
+    );
     res.send(weeklyPlan);
   } catch (error) {
     throw new Error(error);

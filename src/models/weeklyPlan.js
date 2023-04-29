@@ -14,7 +14,7 @@ const dayOfWeekSchema = new Schema({
 const DayOfWeek = model("dayOfWeek", dayOfWeekSchema);
 
 const singleClass = new Schema({
-  classId: {
+  class: {
     type: Schema.Types.ObjectId,
     ref: "ClassModel",
   },
