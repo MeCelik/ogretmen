@@ -106,15 +106,24 @@ router.patch("/:dayId/push-class", auth, async (req, res) => {
 });
 router.patch("/:dayId/update-class/:classId", auth, async (req, res) => {
   try {
+    const { dayId, classId } = req.params;
     const { singleClass } = req.body;
-    console.log(singleClass);
+    const temp = await WeeklyPlan.find({
+      teacher: req.user._id,
+      "days.weekDay": dayId,
+      "days.classes._id": classId,
+    });
     const weeklyPlan = await WeeklyPlan.findOneAndUpdate(
-      { teacher: req.user._id, "days.weekDay": req.params.dayId },
-      { $push: { "days.$.classes": singleClass } },
-      { new: true }
+      {
+        teacher: req.user._id,
+        "days.weekDay": dayId,
+      },
+      { $set: { "days.$[].classes.$[classElem]": singleClass } },
+      { arrayFilters: [{ "classElem._id": classId }], new: true }
     );
     res.send(weeklyPlan);
   } catch (error) {
+    console.log(error);
     throw new Error(error);
   }
 });
