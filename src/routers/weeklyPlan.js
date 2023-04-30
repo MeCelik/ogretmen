@@ -4,6 +4,7 @@ const auth = require("../middleware/auth");
 const admin = require("../middleware/admin");
 const { WeeklyPlan, DayOfWeek } = require("../models/weeklyPlan");
 const { default: mongoose } = require("mongoose");
+const { ClassModel } = require("../models/class");
 
 router.get("/mine", auth, async (req, res) => {
   try {
@@ -132,6 +133,14 @@ router.get("/days", async (req, res) => {
   try {
     const days = await DayOfWeek.find({});
     res.send(days);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+router.get("/classes", async (req, res) => {
+  try {
+    const classes = await ClassModel.find({});
+    res.send(classes);
   } catch (error) {
     throw new Error(error);
   }
