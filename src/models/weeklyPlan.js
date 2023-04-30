@@ -11,12 +11,16 @@ const dayOfWeekSchema = new Schema({
     type: Number,
   },
 });
-const DayOfWeek = model("dayOfWeek", dayOfWeekSchema);
+const DayOfWeek = model("DayOfWeek", dayOfWeekSchema);
 
 const singleClass = new Schema({
   class: {
     type: Schema.Types.ObjectId,
     ref: "ClassModel",
+  },
+  plan: {
+    type: Schema.Types.ObjectId,
+    ref: "Plan",
   },
   start: {
     type: Number,

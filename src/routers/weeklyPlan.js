@@ -5,6 +5,8 @@ const admin = require("../middleware/admin");
 const { WeeklyPlan, DayOfWeek } = require("../models/weeklyPlan");
 const { default: mongoose } = require("mongoose");
 const { ClassModel } = require("../models/class");
+const { ClassWeekContent } = require("../models/classWeekContents");
+const { Grade } = require("../models/grades");
 
 router.get("/mine", auth, async (req, res) => {
   try {
@@ -32,16 +34,18 @@ router.get("/mine/:dayId", auth, async (req, res) => {
   try {
     const weeklyPlan = await WeeklyPlan.findOne({
       teacher: req.user.id,
-    }).populate({
-      path: "days",
-      populate: {
-        path: "classes",
+    })
+      .populate({
+        path: "days",
         populate: {
-          path: "class",
-          model: "ClassModel",
+          path: "classes",
+          populate: {
+            path: "class",
+            model: "ClassModel",
+          },
         },
-      },
-    });
+      })
+      .populate("days.classes.plan");
     if (!weeklyPlan) {
       const days = await DayOfWeek.find({});
       const newWeeklyPlan = new WeeklyPlan({
@@ -75,7 +79,6 @@ router.get("/all", admin, async (req, res) => {
     throw new Error(error);
   }
 });
-
 router.patch("/:dayId", auth, async (req, res) => {
   try {
     const { classes } = req.body;
@@ -128,7 +131,33 @@ router.patch("/:dayId/update-class/:classId", auth, async (req, res) => {
     throw new Error(error);
   }
 });
-
+router.get("/today", auth, async (req, res) => {
+  try {
+    const todayOrder = new Date().getDay();
+    const today = await DayOfWeek.findOne({ order: todayOrder });
+    const weekPlan = await WeeklyPlan.findOne({ teacher: req.user._id })
+      .populate("days.classes.class")
+      .populate("days.classes.plan")
+      .lean();
+    const todaysClass = weekPlan.days.find((item) =>
+      item.weekDay.equals(today._id)
+    );
+    for (let i = 0; i < todaysClass.classes.length; i++) {
+      const singleClass = todaysClass.classes[i];
+      const grade = await Grade.findOne({
+        planId: singleClass.plan._id,
+        class: singleClass.class._id,
+      });
+      const classWeekContents = await ClassWeekContent.findOne({
+        gradeSubject: grade._id,
+      }).lean();
+      singleClass.classWeekContents = classWeekContents;
+    }
+    res.send(todaysClass.classes);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
 router.get("/days", async (req, res) => {
   try {
     const days = await DayOfWeek.find({});

@@ -3,11 +3,23 @@ const router = express.Router();
 const admin = require("../middleware/admin");
 const { Grade } = require("../models/grades");
 const { Plan } = require("../models/plans");
+const { ClassModel } = require("../models/class");
 const auth = require("../middleware/auth");
 
 router.post("/", admin, async (req, res) => {
   try {
     const plan = new Plan({ ...req.body });
+    const classes = await ClassModel.find({});
+    console.log(classes);
+    for (let i = 0; i < classes.length; i++) {
+      const singleClass = classes[i];
+      const grade = new Grade({
+        status: true,
+        planId: plan._id,
+        class: singleClass._id,
+      });
+      await grade.save();
+    }
     await plan.save();
     res.send(plan);
   } catch (error) {
@@ -28,7 +40,9 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {});
 router.get("/:id/grades", admin, async (req, res) => {
   try {
-    const grades = await Grade.find({ planId: req.params.id });
+    const grades = await Grade.find({ planId: req.params.id }).populate(
+      "class"
+    );
     res.send(grades);
   } catch (error) {
     console.log(error);
@@ -37,7 +51,10 @@ router.get("/:id/grades", admin, async (req, res) => {
 });
 router.get("/:id/customer-grades", auth, async (req, res) => {
   try {
-    const grades = await Grade.find({ planId: req.params.id, status: true });
+    const grades = await Grade.find({
+      planId: req.params.id,
+      status: true,
+    }).populate("class");
     res.send(grades);
   } catch (error) {
     console.log(error);

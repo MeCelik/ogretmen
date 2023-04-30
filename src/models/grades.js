@@ -3,11 +3,16 @@ const { Schema, model } = mongoose;
 
 const gradeSchema = new Schema(
   {
-    title: { type: String, trim: true, required: true },
+    title: { type: String, trim: true, default: "" },
     status: { type: Boolean, trim: true, default: true },
     planId: {
       type: Schema.Types.ObjectId,
       ref: "Plan",
+      required: true,
+    },
+    class: {
+      type: Schema.Types.ObjectId,
+      ref: "ClassModel",
       required: true,
     },
   },
