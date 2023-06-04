@@ -105,6 +105,7 @@ router.patch("/:dayId/push-class", auth, async (req, res) => {
     );
     res.send(weeklyPlan);
   } catch (error) {
+    console.log("error", error);
     throw new Error(error);
   }
 });

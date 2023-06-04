@@ -5,6 +5,7 @@ const { Grade } = require("../models/grades");
 const { Plan } = require("../models/plans");
 const { ClassModel } = require("../models/class");
 const auth = require("../middleware/auth");
+const { ClassWeekContent } = require("../models/classWeekContents");
 
 router.post("/", admin, async (req, res) => {
   try {
@@ -72,5 +73,28 @@ router.patch("/:id", admin, async (req, res) => {
 });
 
 router.delete("/:id", admin, async (req, res) => {});
+
+router.get("/class/:classId", async (req, res) => {
+  try {
+    const plans = await Plan.find({});
+    res.send(plans);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send(error);
+  }
+});
+router.get("/achievement/:classId/:planId", async (req, res) => {
+  try {
+    const { classId, planId } = req.params;
+    const grade = await Grade.findOne({ class: classId, planId });
+    const classWeekContents = await ClassWeekContent.find({
+      gradeSubject: grade._id,
+    });
+    res.send(classWeekContents);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send(error);
+  }
+});
 
 module.exports = router;
