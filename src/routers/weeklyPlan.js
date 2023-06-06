@@ -134,7 +134,7 @@ router.patch("/:dayId/update-class/:classId", auth, async (req, res) => {
 });
 router.get("/today", auth, async (req, res) => {
   try {
-    const todayOrder = new Date().getDay();
+    const todayOrder = (new Date().getDay() + 6) % 7;
     const today = await DayOfWeek.findOne({ order: todayOrder });
     const weekPlan = await WeeklyPlan.findOne({ teacher: req.user._id })
       .populate("days.classes.class")
@@ -155,6 +155,42 @@ router.get("/today", auth, async (req, res) => {
       singleClass.classWeekContents = classWeekContents;
     }
     res.send(todaysClass.classes);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+router.get("/get-current-content", auth, async (req, res) => {
+  try {
+    const todayOrder = (new Date().getDay() + 6) % 7;
+    const today = await DayOfWeek.findOne({ order: todayOrder });
+    const weekPlan = await WeeklyPlan.findOne({ teacher: req.user._id })
+      .populate("days.classes.class")
+      .populate("days.classes.plan")
+      .lean();
+    const todaysClass = weekPlan.days.find((item) =>
+      item.weekDay.equals(today._id)
+    );
+    const current = todaysClass.classes.find((item) => {
+      const start = new Date(item.start);
+      const end = new Date(item.end);
+      const now = Date.now();
+      if (now < end && now > start) {
+        return item;
+      }
+    });
+    if (current) {
+      const grade = await Grade.findOne({
+        planId: current.plan._id,
+        class: current.class._id,
+      });
+      const classWeekContents = await ClassWeekContent.findOne({
+        gradeSubject: grade._id,
+      }).lean();
+      res.send({ week: classWeekContents });
+      return;
+    }
+    res.send({ week: null });
+    return;
   } catch (error) {
     throw new Error(error);
   }
