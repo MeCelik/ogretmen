@@ -212,4 +212,24 @@ router.get("/classes", async (req, res) => {
   }
 });
 
+router.get("/my-classes", auth, async (req, res) => {
+  const weekPlan = await WeeklyPlan.findOne({ teacher: req.user._id })
+    .populate("days.classes.class")
+    .populate("days.classes.plan")
+    .lean();
+  const classes = [];
+  for (const day of weekPlan.days) {
+    for (const myClass of day.classes) {
+      if (
+        !classes
+          .map((item) => item._id.toString())
+          .includes(myClass.class._id.toString())
+      ) {
+        classes.push(myClass.class);
+      }
+    }
+  }
+  res.send(classes);
+});
+
 module.exports = router;
