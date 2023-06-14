@@ -31,6 +31,7 @@ router.get("/mine", auth, async (req, res) => {
   }
 });
 router.get("/mine/:dayId", auth, async (req, res) => {
+  console.log("HERE");
   try {
     const weeklyPlan = await WeeklyPlan.findOne({
       teacher: req.user.id,
@@ -218,6 +219,23 @@ router.get("/my-classes", auth, async (req, res) => {
     .populate("days.classes.plan")
     .lean();
   const classes = [];
+
+  if (!weekPlan) {
+    const days = await DayOfWeek.find({});
+    const newWeeklyPlan = new WeeklyPlan({
+      days: days.map((singleDay) => {
+        return {
+          weekDay: singleDay.id,
+          classes: [],
+        };
+      }),
+      teacher: req.user.id,
+    });
+    res.send(classes);
+    await newWeeklyPlan.save();
+    return;
+  }
+
   for (const day of weekPlan.days) {
     for (const myClass of day.classes) {
       if (
